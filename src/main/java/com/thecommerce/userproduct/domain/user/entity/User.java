@@ -1,4 +1,4 @@
-package com.thecommerce.userproduct.domain.user;
+package com.thecommerce.userproduct.domain.user.entity;
 
 import java.time.LocalDateTime;
 import javax.persistence.Entity;
@@ -21,11 +21,13 @@ public class User {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	@Email
-	private String emailId;
+	private String userId;
 	private String password;
 	private String nickname;
 	private String username;
+	private String mobileNumber;
+	@Email
+	private String email;
 	private LocalDateTime createdAt;
 	private LocalDateTime modifiedAt;
 }
