@@ -2,6 +2,7 @@ package com.thecommerce.userproduct.domain.user.dto;
 
 import com.thecommerce.userproduct.domain.user.entity.User;
 import java.time.LocalDateTime;
+import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,6 +18,7 @@ public class UserDto {
 	private String username;
 	private String nickname;
 	private String mobileNumber;
+	@Email
 	private String email;
 
 	private LocalDateTime createdAt;
