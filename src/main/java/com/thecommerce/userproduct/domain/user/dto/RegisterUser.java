@@ -1,5 +1,6 @@
 package com.thecommerce.userproduct.domain.user.dto;
 
+import java.time.LocalDateTime;
 import javax.validation.constraints.Email;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,5 +29,14 @@ public class RegisterUser {
 	public static class Response {
 		private String userId;
 		private String nickname;
+		private LocalDateTime createdAt;
+
+		public static Response from(UserDto userDto) {
+			return Response.builder()
+				.userId(userDto.getUserId())
+				.nickname(userDto.getNickname())
+				.createdAt(userDto.getCreatedAt())
+				.build();
+		}
 	}
 }
