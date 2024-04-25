@@ -1,9 +1,15 @@
 package com.thecommerce.userproduct.service.user;
 
+import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_EMAIL_EXIST;
+import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_MOBILE_NUMBER_EXIST;
+import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_NICKNAME_EXIST;
+import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_USERID_EXIST;
+
 import com.thecommerce.userproduct.domain.user.dto.RegisterUser;
 import com.thecommerce.userproduct.domain.user.dto.UserDto;
 import com.thecommerce.userproduct.domain.user.entity.User;
 import com.thecommerce.userproduct.domain.user.repository.UserRepository;
+import com.thecommerce.userproduct.exception.UserServiceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +32,6 @@ public class UserRegisterService {
 			.email(request.getEmail())
 			.build()));
 	}
-
 	private void validateRegister(RegisterUser.Request request) {
 		validateRegisterUserId(request.getUserId());
 		validateRegisterEmail(request.getEmail());
@@ -36,25 +41,25 @@ public class UserRegisterService {
 
 	private void validateRegisterEmail(String email) {
 		if (userRepository.findByEmail(email).isPresent()) {
-			throw new RuntimeException("이메일 중복");
+			throw new UserServiceException(ALREADY_EMAIL_EXIST);
 		}
 	}
 
 	private void validateRegisterMobileNumber(String mobileNumber) {
 		if (userRepository.findByMobileNumber(mobileNumber).isPresent()) {
-			throw new RuntimeException("모바일 번호 중복");
+			throw new UserServiceException(ALREADY_MOBILE_NUMBER_EXIST);
 		}
 	}
 
 	private void validateRegisterNickname(String nickname) {
 		if (userRepository.findByNickname(nickname).isPresent()) {
-			throw new RuntimeException("닉네임 중복");
+			throw new UserServiceException(ALREADY_NICKNAME_EXIST);
 		}
 	}
 
 	private void validateRegisterUserId(String userId) {
 		if (userRepository.findByUserId(userId).isPresent()) {
-			throw new RuntimeException("아이디 중복");
+			throw new UserServiceException(ALREADY_USERID_EXIST);
 		}
 	}
 }
