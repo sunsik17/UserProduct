@@ -4,15 +4,19 @@ import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_E
 import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_MOBILE_NUMBER_EXIST;
 import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_NICKNAME_EXIST;
 import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_USERID_EXIST;
+import static com.thecommerce.userproduct.exception.contants.ErrorCode.NEED_TO_CHECK_THE_NICKNAME_LENGTH;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.thecommerce.userproduct.domain.user.dto.RegisterUser;
+import com.thecommerce.userproduct.domain.user.dto.UpdateUser;
 import com.thecommerce.userproduct.domain.user.dto.UserDto;
 import com.thecommerce.userproduct.exception.UserServiceException;
 import com.thecommerce.userproduct.service.user.UserRegisterService;
@@ -165,4 +169,62 @@ public class UserControllerTest {
 			.andExpect(jsonPath("$.errorCode").value("ALREADY_EMAIL_EXIST"))
 			.andDo(print());
 	}
+
+	@Test
+	@DisplayName("회원 정보 수정 성공")
+	void successUpdateUser() throws Exception {
+		//given
+		LocalDateTime dateTime = LocalDateTime.now();
+
+		UpdateUser.Request request = UpdateUser.Request.builder()
+			.nickname("new")
+			.email("newEmail")
+			.mobileNumber("01012345678")
+			.build();
+
+		given(userRegisterService.update(anyString(), any()))
+			.willReturn(UserDto.builder()
+				.username("nss")
+				.userId("17sunsik")
+				.mobileNumber("01012345678")
+				.email("newEmail@ee.com")
+				.nickname("new")
+				.createdAt(dateTime)
+				.updatedAt(dateTime)
+				.build());
+		//when
+		//then
+		mockMvc.perform(put("/api/users/17sunsik")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.nickname").value("new"))
+			.andExpect(jsonPath("$.mobile").value("01012345678"))
+			.andExpect(jsonPath("$.email").value("newEmail@ee.com"))
+			.andExpect(jsonPath("$.updatedAt").value(dateTime.toString()))
+			.andExpect(status().isOk())
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("회원정보 수정 실패 - 닉네임 글자 수 오류")
+	void failedUpdateUserNickname() throws Exception {
+		//given
+		UpdateUser.Request request = UpdateUser.Request.builder()
+			.nickname("newNickname")
+			.email("newEmail@ee.com")
+			.mobileNumber("01012345678")
+			.build();
+
+		given(userRegisterService.update(anyString(), any())).
+			willThrow(new UserServiceException(NEED_TO_CHECK_THE_NICKNAME_LENGTH));
+		//when
+		//then
+		mockMvc.perform(put("/api/users/17sunsik")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(jsonPath("$.errorCode").value("NEED_TO_CHECK_THE_NICKNAME_LENGTH"))
+			.andDo(print());
+	}
+
 }

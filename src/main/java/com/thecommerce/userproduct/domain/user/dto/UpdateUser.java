@@ -27,13 +27,13 @@ public class UpdateUser {
 		private String nickname;
 		private String mobile;
 		private String email;
-		private LocalDateTime modifiedAt;
+		private LocalDateTime updatedAt;
 		public static Response from(UserDto userDto) {
 			return Response.builder()
 				.mobile(userDto.getMobileNumber())
 				.email(userDto.getEmail())
 				.nickname(userDto.getNickname())
-				.modifiedAt(userDto.getUpdatedAt())
+				.updatedAt(userDto.getUpdatedAt())
 				.build();
 		}
 	}

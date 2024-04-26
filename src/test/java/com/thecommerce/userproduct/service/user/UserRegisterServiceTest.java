@@ -4,12 +4,14 @@ package com.thecommerce.userproduct.service.user;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.thecommerce.userproduct.domain.user.dto.RegisterUser;
 import com.thecommerce.userproduct.domain.user.dto.RegisterUser.Request;
+import com.thecommerce.userproduct.domain.user.dto.UpdateUser;
 import com.thecommerce.userproduct.domain.user.entity.User;
 import com.thecommerce.userproduct.domain.user.repository.UserRepository;
 import com.thecommerce.userproduct.exception.UserServiceException;
@@ -35,7 +37,7 @@ public class UserRegisterServiceTest {
 	@Test
 	@DisplayName("회원가입 성공")
 	void successRegisterUser() {
-	    //given
+		//given
 		given(userRepository.save(any()))
 			.willReturn(User.builder()
 				.userId("1")
@@ -45,7 +47,7 @@ public class UserRegisterServiceTest {
 				.nickname("1")
 				.email("17sunsik@gmail.com")
 				.build());
-	    //when
+		//when
 		userRegisterService.join(new Request(
 			"17sunsik",
 			"1234",
@@ -55,7 +57,7 @@ public class UserRegisterServiceTest {
 			"17sunsik@gmail.com"
 		));
 		ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-	    //then
+		//then
 		verify(userRepository, times(1)).save(captor.capture());
 		assertEquals("17sunsik", captor.getValue().getUserId());
 		assertEquals("1234", captor.getValue().getPassword());
@@ -171,5 +173,80 @@ public class UserRegisterServiceTest {
 			)));
 		//then
 		assertEquals(ErrorCode.ALREADY_NICKNAME_EXIST, userServiceException.getErrorCode());
+	}
+
+	@Test
+	@DisplayName("회원정보 수정 성공")
+	void successUpdateUser() {
+		//given
+		User user = User.builder()
+			.userId("17sunsik")
+			.password("1234")
+			.username("nss")
+			.mobileNumber("01033538090")
+			.nickname("nj2")
+			.email("17sunsik@gmail.com")
+			.build();
+
+		User updateUser = User.builder()
+			.userId("17sunsik")
+			.password("1234")
+			.username("nss")
+			.mobileNumber("01012345678")
+			.nickname("new")
+			.email("new@new.com")
+			.build();
+
+		given(userRepository.findByUserId(anyString()))
+			.willReturn(Optional.ofNullable(user));
+		given(userRepository.save(any()))
+			.willReturn(updateUser);
+		//when
+		userRegisterService.update("17sunsik",
+			UpdateUser.Request.builder()
+				.email("new@new.com")
+				.nickname("new")
+				.mobileNumber("01012345678")
+				.build()
+		);
+		ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+		//then
+		verify(userRepository, times(1)).save(captor.capture());
+		assertEquals("17sunsik", captor.getValue().getUserId());
+		assertEquals("1234", captor.getValue().getPassword());
+		assertEquals("new@new.com", captor.getValue().getEmail());
+		assertEquals("01012345678", captor.getValue().getMobileNumber());
+		assertEquals("nss", captor.getValue().getUsername());
+		assertEquals("new", captor.getValue().getNickname());
+	}
+
+	@Test
+	@DisplayName("회원정보 수정 실패 - 닉네임 길이 제한")
+	void failUpdateUser() {
+		//given
+		User user = User.builder()
+			.userId("17sunsik")
+			.password("1234")
+			.username("nss")
+			.mobileNumber("01033538090")
+			.nickname("nj2")
+			.email("17sunsik@gmail.com")
+			.build();
+
+		given(userRepository.findByUserId(anyString()))
+			.willReturn(Optional.ofNullable(user));
+
+		//when
+		UserServiceException exception = assertThrows(UserServiceException.class,
+			() -> userRegisterService.update("17sunsik",
+				UpdateUser.Request.builder()
+					.email("new@new.com")
+					.nickname("newNickname")
+					.mobileNumber("01012345678")
+					.build()
+			));
+		//then
+		assertEquals(ErrorCode.NEED_TO_CHECK_THE_NICKNAME_LENGTH, exception.getErrorCode());
+		verify(userRepository, times(0)).save(any());
 	}
 }

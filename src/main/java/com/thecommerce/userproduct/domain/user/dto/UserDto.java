@@ -32,7 +32,7 @@ public class UserDto {
 			.mobileNumber(user.getMobileNumber())
 			.email(user.getEmail())
 			.createdAt(user.getCreatedAt())
-			.updatedAt(user.getUpdateAt())
+			.updatedAt(user.getUpdatedAt())
 			.build();
 	}
 }
