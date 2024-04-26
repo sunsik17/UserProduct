@@ -16,7 +16,11 @@ public enum ErrorCode {
 	ALREADY_EMAIL_EXIST (BAD_REQUEST, "이메일 중복"),
 	ALREADY_NICKNAME_EXIST (BAD_REQUEST, "닉네임 중복"),
 	ALREADY_MOBILE_NUMBER_EXIST (BAD_REQUEST, "모바일 번호 중복"),
-	ALREADY_USERID_EXIST (BAD_REQUEST, "유저 아이디 중복");
+	ALREADY_USERID_EXIST (BAD_REQUEST, "유저 아이디 중복"),
+
+	NEED_TO_CHECK_THE_NICKNAME_LENGTH(BAD_REQUEST, "닉네임 길이는 2자 이상 6자 이하"),
+	NOT_FOUND_USER(BAD_REQUEST, "유저를 찾을 수 없음")
+	;
 
 	private final HttpStatus httpStatus;
 	private final String description;

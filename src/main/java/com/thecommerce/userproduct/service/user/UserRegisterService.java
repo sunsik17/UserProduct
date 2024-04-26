@@ -4,8 +4,10 @@ import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_E
 import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_MOBILE_NUMBER_EXIST;
 import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_NICKNAME_EXIST;
 import static com.thecommerce.userproduct.exception.contants.ErrorCode.ALREADY_USERID_EXIST;
+import static com.thecommerce.userproduct.exception.contants.ErrorCode.NOT_FOUND_USER;
 
 import com.thecommerce.userproduct.domain.user.dto.RegisterUser;
+import com.thecommerce.userproduct.domain.user.dto.UpdateUser;
 import com.thecommerce.userproduct.domain.user.dto.UserDto;
 import com.thecommerce.userproduct.domain.user.entity.User;
 import com.thecommerce.userproduct.domain.user.repository.UserRepository;
@@ -32,6 +34,16 @@ public class UserRegisterService {
 			.email(request.getEmail())
 			.build()));
 	}
+
+	public UserDto update(String userId, UpdateUser.Request request) {
+		User user = userRepository.findByUserId(userId).orElseThrow(
+			() -> new UserServiceException(NOT_FOUND_USER)
+		);
+
+		user.update(request.getNickname(), request.getMobileNumber(), request.getEmail());
+		return UserDto.fromEntity(userRepository.save(user));
+	}
+
 	private void validateRegister(RegisterUser.Request request) {
 		validateRegisterUserId(request.getUserId());
 		validateRegisterEmail(request.getEmail());
