@@ -4,8 +4,13 @@ import static com.thecommerce.userproduct.exception.contants.ErrorCode.NEED_TO_C
 
 import com.thecommerce.userproduct.domain.BaseEntity;
 import com.thecommerce.userproduct.exception.UserServiceException;
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,12 +22,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class User extends BaseEntity {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Column(unique = true, nullable = false)
 	private String userId;
+	@NotNull
 	private String password;
+	@Column(unique = true, nullable = false)
 	private String nickname;
+	@NotNull
 	private String username;
+	@Column(unique = true, nullable = false)
 	private String mobileNumber;
 	@Email
+	@Column(unique = true, nullable = false)
 	private String email;
 
 	public void update(String newNickname, String newMobileNum, String newEmail) {

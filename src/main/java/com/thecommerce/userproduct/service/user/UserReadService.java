@@ -21,8 +21,8 @@ public class UserReadService {
 
 		Long nextKey = users.isEmpty() ? null :
 			users.stream()
-			.mapToLong(User::getId)
-			.max().orElse(PageResult.NON_KEY);
+				.mapToLong(User::getId)
+				.max().orElse(PageResult.NON_KEY);
 
 		return new PageResult<>(
 			users.stream()
