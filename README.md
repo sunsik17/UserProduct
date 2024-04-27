@@ -23,6 +23,15 @@ cd UserProduct
 java -jar build/libs/UserProduct-0.0.1-SNAPSHOT.jar
 ```
 
+#### test (unit test code)
+```shell
+./gradlew test
+```
+**or**
+```shell
+./gradlew test -i
+```
+
 #### create users (테스트를 위한 100명 회원 생성)
 ```shell
 curl --request POST 'http://localhost:8080/create-users'
@@ -52,6 +61,8 @@ http://localhost:8080/swagger-ui.html
 - database
 
 ![h2](https://img.shields.io/badge/H2-003DFF?style=for-the-badge&logo=algolia&logoColor=003DFF)
+
+## Project Tree
 
 ```
 UserProduct
