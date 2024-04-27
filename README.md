@@ -31,7 +31,7 @@ curl --request POST 'http://localhost:8080/create-users'
 ## h2 db
 
 어플리케이션 실행이 완료 되면
-http://localhost:8080/h2-console 접속 후 아래 url로 jdbc url을 변경해 연결한다.
+http://localhost:8080/h2-console 접속 후 아래 url로 jdbc url을 변경해 연결하면 데이터를 조회할 수 있다.
 ```
 jdbc:h2:mem:the-commerce
 ```
@@ -92,18 +92,23 @@ UserProduct
 
 ## Features
 
-> 회원 등록
->- 입력 받은 id, password, nickname, username, mobile, email을 이용해 회원을 등록할 수 있다.
->  - 중복 id 회원 가입 불가
->  - 중복 닉네임 회원 가입 불가
->  - 중복 모바일 회원 가입 불가
->  - 중복 이메일 회원 가입 불가
->- 닉네임은 2자 이상 6자 이하이다.
+### 회원 등록
+- 입력 받은 id, password, nickname, username, mobile, email을 이용해 회원을 등록할 수 있다.
+  - 중복 id 회원 가입 불가
+  - 중복 닉네임 회원 가입 불가
+  - 중복 모바일 회원 가입 불가
+  - 중복 이메일 회원 가입 불가
+- 닉네임은 2자 이상 6자 이하이다.
 
->회원 수정
-> - 기존에 가입 되어 있는 유저는 정보(email, nickname, password)를 수정 할 수 있다.
->   - email, password, nickname 중 입력하지 않은 정보는 기존 상태를 유지한다. 
+### 회원 수정
+ - 기존에 가입 되어 있는 유저는 정보(email, nickname, password)를 수정 할 수 있다.
+   - email, password, nickname 중 입력하지 않은 정보는 기존 상태를 유지한다. 
 
->회원 목록 조회
-> - username, createdAt 을 기준으로 오름차순 user 목록을 조회할 수 있다
+### 회원 목록 조회
+ - username, createdAt 을 기준으로 오름차순 user 목록을 조회할 수 있다
  
+## Log
+
+로그 발생 시 최상위 logs 디렉토리가 만들어지고 하위에 log 파일들이 생성 된다.
+- error이상의 로그를 담는 error_file.log
+- info이상의 로그를 담는 log_file.log
