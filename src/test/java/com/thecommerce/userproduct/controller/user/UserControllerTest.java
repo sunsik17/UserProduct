@@ -57,7 +57,7 @@ public class UserControllerTest {
 	@DisplayName("회원가입 성공")
 	void successCreateUser() throws Exception {
 		//given
-		LocalDateTime dateTime = LocalDateTime.now();
+		LocalDateTime dateTime = LocalDateTime.of(2024, 4, 28, 2, 38, 36);
 		given(userRegisterService.join(any()))
 			.willReturn(UserDto.builder()
 				.username("nss")
@@ -130,6 +130,7 @@ public class UserControllerTest {
 		mockMvc.perform(post("/api/users/join")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errorCode").value("ALREADY_NICKNAME_EXIST"))
 			.andDo(print());
 	}
@@ -153,6 +154,7 @@ public class UserControllerTest {
 		mockMvc.perform(post("/api/users/join")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errorCode").value("ALREADY_MOBILE_NUMBER_EXIST"))
 			.andDo(print());
 	}
@@ -176,6 +178,7 @@ public class UserControllerTest {
 		mockMvc.perform(post("/api/users/join")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errorCode").value("ALREADY_EMAIL_EXIST"))
 			.andDo(print());
 	}
@@ -184,7 +187,7 @@ public class UserControllerTest {
 	@DisplayName("회원 정보 수정 성공")
 	void successUpdateUser() throws Exception {
 		//given
-		LocalDateTime dateTime = LocalDateTime.now();
+		LocalDateTime dateTime = LocalDateTime.of(2024, 4, 28, 2, 38, 36);
 
 		UpdateUser.Request request = UpdateUser.Request.builder()
 			.nickname("new")
@@ -233,6 +236,7 @@ public class UserControllerTest {
 		mockMvc.perform(put("/api/users/17sunsik")
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(objectMapper.writeValueAsString(request)))
+			.andExpect(status().isBadRequest())
 			.andExpect(jsonPath("$.errorCode").value("NEED_TO_CHECK_THE_NICKNAME_LENGTH"))
 			.andDo(print());
 	}
@@ -242,7 +246,7 @@ public class UserControllerTest {
 	void getUsersHasNextTrue() throws Exception {
 		//given
 		List<UserDto> usersResponse = new ArrayList<>();
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.of(2024, 4, 28, 2, 37, 36);
 		for (int i = 0; i < 10; i++) {
 			usersResponse.add(UserDto.builder()
 				.userId("sunsik" + i)
@@ -250,8 +254,8 @@ public class UserControllerTest {
 				.email("nss@gma.com" + i)
 				.mobileNumber("010" + i)
 				.username("ss" + i)
-				.createdAt(now)
-				.updatedAt(now)
+				.createdAt(now.plusHours(i))
+				.updatedAt(now.plusHours(i))
 				.build());
 		}
 		usersResponse.add(UserDto.builder().build());
@@ -279,8 +283,8 @@ public class UserControllerTest {
 			.andExpect(jsonPath("$.body[4].email").value("nss@gma.com4"))
 			.andExpect(jsonPath("$.body[4].mobileNumber").value("0104"))
 			.andExpect(jsonPath("$.body[4].username").value("ss4"))
-			.andExpect(jsonPath("$.body[4].createdAt").value(now.toString()))
-			.andExpect(jsonPath("$.body[4].updatedAt").value(now.toString()))
+			.andExpect(jsonPath("$.body[4].createdAt").value(now.plusHours(4).toString()))
+			.andExpect(jsonPath("$.body[4].updatedAt").value(now.plusHours(4).toString()))
 			.andDo(print());
 	}
 
@@ -289,7 +293,7 @@ public class UserControllerTest {
 	void getUsersHasNextFalse() throws Exception {
 		//given
 		List<UserDto> usersResponse = new ArrayList<>();
-		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime now = LocalDateTime.of(2024, 4, 28, 2, 38, 36);
 		for (int i = 0; i < 10; i++) {
 			usersResponse.add(UserDto.builder()
 				.userId("sunsik" + i)
@@ -297,8 +301,8 @@ public class UserControllerTest {
 				.email("nss@gma.com" + i)
 				.mobileNumber("010" + i)
 				.username("ss" + i)
-				.createdAt(now)
-				.updatedAt(now)
+				.createdAt(now.plusHours(i))
+				.updatedAt(now.plusHours(i))
 				.build());
 		}
 		usersResponse.add(UserDto.builder().build());
@@ -326,8 +330,8 @@ public class UserControllerTest {
 			.andExpect(jsonPath("$.body[9].email").value("nss@gma.com9"))
 			.andExpect(jsonPath("$.body[9].mobileNumber").value("0109"))
 			.andExpect(jsonPath("$.body[9].username").value("ss9"))
-			.andExpect(jsonPath("$.body[9].createdAt").value(now.toString()))
-			.andExpect(jsonPath("$.body[9].updatedAt").value(now.toString()))
+			.andExpect(jsonPath("$.body[9].createdAt").value(now.plusHours(9).toString()))
+			.andExpect(jsonPath("$.body[9].updatedAt").value(now.plusHours(9).toString()))
 			.andDo(print());
 	}
 }
