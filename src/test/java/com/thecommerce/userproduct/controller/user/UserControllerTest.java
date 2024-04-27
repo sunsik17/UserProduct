@@ -8,6 +8,7 @@ import static com.thecommerce.userproduct.exception.contants.ErrorCode.NEED_TO_C
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -19,13 +20,19 @@ import com.thecommerce.userproduct.domain.user.dto.RegisterUser;
 import com.thecommerce.userproduct.domain.user.dto.UpdateUser;
 import com.thecommerce.userproduct.domain.user.dto.UserDto;
 import com.thecommerce.userproduct.exception.UserServiceException;
+import com.thecommerce.userproduct.service.user.UserReadService;
 import com.thecommerce.userproduct.service.user.UserRegisterService;
+import com.thecommerce.userproduct.util.PageResult;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -35,6 +42,9 @@ public class UserControllerTest {
 
 	@MockBean
 	private UserRegisterService userRegisterService;
+
+	@MockBean
+	private UserReadService userReadService;
 
 	@Autowired
 	private MockMvc mockMvc;
@@ -227,4 +237,97 @@ public class UserControllerTest {
 			.andDo(print());
 	}
 
+	@Test
+	@DisplayName("유저 목록 조회 - 다음페이지 존재")
+	void getUsersHasNextTrue() throws Exception {
+		//given
+		List<UserDto> usersResponse = new ArrayList<>();
+		LocalDateTime now = LocalDateTime.now();
+		for (int i = 0; i < 10; i++) {
+			usersResponse.add(UserDto.builder()
+				.userId("sunsik" + i)
+				.nickname("nss" + i)
+				.email("nss@gma.com" + i)
+				.mobileNumber("010" + i)
+				.username("ss" + i)
+				.createdAt(now)
+				.updatedAt(now)
+				.build());
+		}
+		usersResponse.add(UserDto.builder().build());
+		given(userReadService.getUsers(any()))
+			.willReturn(new PageResult<>(
+				usersResponse,
+				true
+			));
+		//when
+		//then
+		mockMvc.perform(get("/api/users/list")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(PageRequest.of(0, 5, Sort.by("createdAt")))))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.hasNext").value(true))
+			.andExpect(jsonPath("$.body[0].userId").value("sunsik0"))
+			.andExpect(jsonPath("$.body[0].nickname").value("nss0"))
+			.andExpect(jsonPath("$.body[0].email").value("nss@gma.com0"))
+			.andExpect(jsonPath("$.body[0].mobileNumber").value("0100"))
+			.andExpect(jsonPath("$.body[0].username").value("ss0"))
+			.andExpect(jsonPath("$.body[0].createdAt").value(now.toString()))
+			.andExpect(jsonPath("$.body[0].updatedAt").value(now.toString()))
+			.andExpect(jsonPath("$.body[4].userId").value("sunsik4"))
+			.andExpect(jsonPath("$.body[4].nickname").value("nss4"))
+			.andExpect(jsonPath("$.body[4].email").value("nss@gma.com4"))
+			.andExpect(jsonPath("$.body[4].mobileNumber").value("0104"))
+			.andExpect(jsonPath("$.body[4].username").value("ss4"))
+			.andExpect(jsonPath("$.body[4].createdAt").value(now.toString()))
+			.andExpect(jsonPath("$.body[4].updatedAt").value(now.toString()))
+			.andDo(print());
+	}
+
+	@Test
+	@DisplayName("유저 목록 조회 - 마지막페이지")
+	void getUsersHasNextFalse() throws Exception {
+		//given
+		List<UserDto> usersResponse = new ArrayList<>();
+		LocalDateTime now = LocalDateTime.now();
+		for (int i = 0; i < 10; i++) {
+			usersResponse.add(UserDto.builder()
+				.userId("sunsik" + i)
+				.nickname("nss" + i)
+				.email("nss@gma.com" + i)
+				.mobileNumber("010" + i)
+				.username("ss" + i)
+				.createdAt(now)
+				.updatedAt(now)
+				.build());
+		}
+		usersResponse.add(UserDto.builder().build());
+		given(userReadService.getUsers(any()))
+			.willReturn(new PageResult<>(
+				usersResponse,
+				false
+			));
+		//when
+		//then
+		mockMvc.perform(get("/api/users/list")
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(PageRequest.of(0, 10, Sort.by("createdAt")))))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$.hasNext").value(false))
+			.andExpect(jsonPath("$.body[0].userId").value("sunsik0"))
+			.andExpect(jsonPath("$.body[0].nickname").value("nss0"))
+			.andExpect(jsonPath("$.body[0].email").value("nss@gma.com0"))
+			.andExpect(jsonPath("$.body[0].mobileNumber").value("0100"))
+			.andExpect(jsonPath("$.body[0].username").value("ss0"))
+			.andExpect(jsonPath("$.body[0].createdAt").value(now.toString()))
+			.andExpect(jsonPath("$.body[0].updatedAt").value(now.toString()))
+			.andExpect(jsonPath("$.body[9].userId").value("sunsik9"))
+			.andExpect(jsonPath("$.body[9].nickname").value("nss9"))
+			.andExpect(jsonPath("$.body[9].email").value("nss@gma.com9"))
+			.andExpect(jsonPath("$.body[9].mobileNumber").value("0109"))
+			.andExpect(jsonPath("$.body[9].username").value("ss9"))
+			.andExpect(jsonPath("$.body[9].createdAt").value(now.toString()))
+			.andExpect(jsonPath("$.body[9].updatedAt").value(now.toString()))
+			.andDo(print());
+	}
 }
