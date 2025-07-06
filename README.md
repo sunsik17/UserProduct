@@ -1,7 +1,7 @@
 # UserProduct
 더 커머스 백엔드 기술 과제 
 
-회원 기능을 담당하는 restful api 백엔드 서버
+회원 기능을 담당 하는 restful api 백엔드 서버
 
 ## Installation
 
